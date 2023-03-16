@@ -1,11 +1,15 @@
 import './App.css'
 import InitialBoard from './components/InitialBoard'
+import { ScoreBlack } from './components/ScoreBlack'
+import { ScoreWhithe } from './components/ScoreWhithe'
 
 function App() {
   
    return (
     <div>
-      <InitialBoard/>
+        <InitialBoard />
+        <ScoreBlack/>
+        <ScoreWhithe/>
     </div>
   )
 }
