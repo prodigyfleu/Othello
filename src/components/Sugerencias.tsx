@@ -26,7 +26,7 @@ export const TogglerSwitch: React.FC<TogglerSwitchProps> = ({ onToggle }) => {
       if (isActive) {
         handleToggle();
       }
-    }, 800); // Change the delay time to adjust how long the component should be active
+    }, 600);
     return () => clearTimeout(timer);
   }, [isActive]);
 

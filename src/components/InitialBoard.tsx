@@ -19,7 +19,7 @@ export default function InitialBoard() {
   let fichasRestantesBlanca = 30; // fichas restantes blancas
   let gameOver = false; // variable para decidir si el juego ha terminado
   let sugerencias = 0; // variable para decidir si se muestran las sugerencias
-  let diagonalMovementsEnabled = false // variable para activar y desactivar el movimiento diagonal
+  let movimientoDiagonal = false // variable para activar y desactivar el movimiento diagonal
   const boardSize = 8; // tamaño del tablero
 
   // funcion para crear el tablero
@@ -38,18 +38,18 @@ export default function InitialBoard() {
   
 
 
-  //función on load
+//función on load
 window.onload = function() {
-    TpuntuacionNegra = document.getElementById('puntuacionNegra');
-    TpuntuacionBlanca = document.getElementById('puntuacionBlanca');
-    FichasRestantesNegra = document.getElementById('FichasRestantesNegra');
-    FichasRestantesBlanca = document.getElementById('FichasRestantesBlanca');
-    if(sugerencias === 1 && capaDeSugerencias){
-      creaCapaDeSugerencias();
-    }
-    initializeBoard(boardSize);
+  TpuntuacionNegra = document.getElementById('puntuacionNegra');
+  TpuntuacionBlanca = document.getElementById('puntuacionBlanca');
+  FichasRestantesNegra = document.getElementById('FichasRestantesNegra');
+  FichasRestantesBlanca = document.getElementById('FichasRestantesBlanca');
+  initializeBoard(boardSize);
+  if(sugerencias === 1 && capaDeSugerencias){
+    creaCapaDeSugerencias();
+  }
 
-  // fondo negro
+// fondo negro
   BBackground = document.getElementById('BBackground');
   if (BBackground) {
     BBackground.style.position = "absolute";
@@ -62,8 +62,7 @@ window.onload = function() {
     BBackground.style.transform = "translate(-50%, -50%)";
   }
 
-  // capa de fichas
-
+// capa de fichas
   capaDeFichas = document.getElementById('capaDeFichas');
   if(capaDeFichas){
   BBackground?.appendChild(capaDeFichas)};
@@ -76,16 +75,15 @@ window.onload = function() {
     capaDeFichas.style.zIndex = "1";
   }
 
-  // capa de sugerencias
-
-  capaDeSugerencias = document.getElementById('capaDeSugerencias');
+// capa de sugerencias
+capaDeSugerencias = document.getElementById('capaDeSugerencias');
   if(sugerencias === 1 && capaDeSugerencias){
     creaCapaDeSugerencias();
   }
 };
 
 
-  // función para crear los cuadros verdes del mapa (se modificará para expandir el tablero)
+// función para crear los cuadros verdes del mapa (se modificará para expandir el tablero)
 function creaCuadrosVerdes() {
   for (let filas = 0; filas < boardSize; filas++) {
     for (let columnas = 0; columnas < boardSize; columnas++) {
@@ -104,8 +102,7 @@ function creaCuadrosVerdes() {
     }
   }
 
-  // función que se ejecuta al hacer click en un cuadro vacio
-  
+// función que se ejecuta al hacer click en un cuadro vacio 
 function clickEnCuadro(filas: number, columnas: number) {
 
     if(gameOver === true){return};
@@ -116,22 +113,27 @@ function clickEnCuadro(filas: number, columnas: number) {
 
     if(puedeDarClick(turno, filas, columnas) === true)
     {
-      let fichasAfectadas = getFichasAfectadas(turno, filas, columnas);
+      let fichasAfectadas: [] = getFichasAfectadas(turno, filas, columnas);
       girarFichas(fichasAfectadas);
       fichas[filas][columnas] = turno;
       if (turno === 1) {
+
         fichasRestantesNegra--;
       } else {
         fichasRestantesBlanca--;
       }
+
       if(turno === 1) turno = 2;
       else if (turno === 2) turno = 1;
+
       if (!puedeMover(1) || !puedeMover(2) || fichasRestantesBlanca === 0 || fichasRestantesNegra === 0) {
         gameOver = true;
         terminarJuego();
       }
+
       actualizaFichasRestantes();
       creaFichas();
+
       if (sugerencias === 1) {
         creaCapaDeSugerencias();
       }
@@ -139,15 +141,15 @@ function clickEnCuadro(filas: number, columnas: number) {
     }    
   }
 
- // función para verificar el lugar de click
+// función para verificar el lugar de click
 
-     function puedeDarClick(id: number, filas: number, columnas: number): boolean {
-      let fichasAfectadas = getFichasAfectadas(id, filas, columnas);
-      if(fichasAfectadas.length === 0) return false;
-      else return true;
-    }
+  function puedeDarClick(id: number, filas: number, columnas: number): boolean {
+    let fichasAfectadas: [] = getFichasAfectadas(id, filas, columnas);
+    if(fichasAfectadas.length === 0) return false;
+    else return true;
+  }
 
-  // funcioon para comprobar si se pueden mover
+// funcioon para comprobar si se pueden mover
 
   function puedeMover(id: number) {
     for (let filas = 0; filas < boardSize; filas++) {
@@ -160,29 +162,30 @@ function clickEnCuadro(filas: number, columnas: number) {
   return false;
 }
 
-  // función para crear puntuaciones
+// función para crear puntuaciones
 
-  function creaPuntuaciones(){
-    let puntuacionBlanca = 0;
-    let puntuacionNegra = 0;
+function creaPuntuaciones(){
+  let puntuacionBlanca = 0;
+  let puntuacionNegra = 0;
     
 
-    for (let filas = 0; filas < boardSize; filas++) {
-      for (let columnas = 0; columnas < boardSize; columnas++) {
-          let value = fichas[filas][columnas];
-          if(value === 2){ 
-            puntuacionBlanca++;
-          }
-          if(value === 1){ 
-            puntuacionNegra++;
-          }
+  for (let filas = 0; filas < boardSize; filas++) {
+    for (let columnas = 0; columnas < boardSize; columnas++) {
+        let value = fichas[filas][columnas];
+        if(value === 2){ 
+          puntuacionBlanca++;
+        }
+        if(value === 1){ 
+          puntuacionNegra++;
+        }
       }
     }
-    if(TpuntuacionNegra !== null){
-      TpuntuacionNegra.innerHTML = `Black's score: ${puntuacionNegra}`;
+
+  if(TpuntuacionNegra !== null){
+      TpuntuacionNegra.innerHTML = `Black's Score: ${puntuacionNegra}`;
     };
-    if(TpuntuacionBlanca !== null){
-      TpuntuacionBlanca.innerHTML = `White's score: ${puntuacionBlanca}`;
+  if(TpuntuacionBlanca !== null){
+      TpuntuacionBlanca.innerHTML = `White's Score: ${puntuacionBlanca}`;
     };
   }
 
@@ -195,7 +198,7 @@ function clickEnCuadro(filas: number, columnas: number) {
       for (let columnas = 0; columnas < boardSize; columnas++) {
         let value = fichas[filas][columnas];
         if(value === 0){
-
+          
         } else {
           const ficha = document.createElement('div');
           ficha.className = 'absolute';
@@ -221,7 +224,7 @@ function clickEnCuadro(filas: number, columnas: number) {
     }
   }
 
-    // función para crear la capa de sugerencias
+// función para crear la capa de sugerencias
 
     function creaCapaDeSugerencias(){
   if(capaDeSugerencias !== null){
@@ -254,9 +257,9 @@ function clickEnCuadro(filas: number, columnas: number) {
   }
 }
 
-  // función para obtener las fichas afectadas
+// función para obtener las fichas afectadas
 
-  function getFichasAfectadas(id: number, filas: number, columnas: number){
+  function getFichasAfectadas(id: number, filas: number, columnas: number): [] {
 
     // a la derecha
     let fichasAfectadas: any = [];
@@ -330,7 +333,7 @@ function clickEnCuadro(filas: number, columnas: number) {
 
     // diagonales
 
-    if (diagonalMovementsEnabled){
+    if (movimientoDiagonal){
 
       // diagonal hacia abajo derecha
       fichasAfectadasTemp = [];
@@ -411,21 +414,20 @@ function clickEnCuadro(filas: number, columnas: number) {
   return fichasAfectadas;
 }
 
-  // función para girar las fichas
+// función para girar las fichas
 
-  function girarFichas(fichasAfectadas: any){
-    for(let i = 0; i < fichasAfectadas.length; i++){
-      let lugar = fichasAfectadas[i];
-      if(fichas[lugar.filas][lugar.columnas] == 1){
-        fichas[lugar.filas][lugar.columnas] = 2;
-      } else {
-        fichas[lugar.filas][lugar.columnas] = 1;
-      }
+function girarFichas(fichasAfectadas: any){
+  for(let i = 0; i < fichasAfectadas.length; i++){
+    let lugar = fichasAfectadas[i];
+    if(fichas[lugar.filas][lugar.columnas] == 1){
+      fichas[lugar.filas][lugar.columnas] = 2;
+    } else {
+      fichas[lugar.filas][lugar.columnas] = 1;
     }
   }
+}
 
-  // funcion para actualizar fichas restantes
-
+// funcion para actualizar fichas restantes
   function actualizaFichasRestantes(){
 
     if (FichasRestantesNegra) {
@@ -490,7 +492,7 @@ function terminarJuego() {
 
 
 
-  // función para reiniciar el tablero
+// función para reiniciar el tablero
 
   function reiniciarTablero() {
     initializeBoard(boardSize);
@@ -501,12 +503,11 @@ function terminarJuego() {
     creaFichas();
     creaPuntuaciones();
     actualizaFichasRestantes();
-    creaCuadrosVerdes();
   }
 
-  // botón para activar y desactivar sugerencias
+// botón para activar y desactivar sugerencias
 
-  const toggleSugerencias = (state: boolean) => {
+const toggleSugerencias = (state: boolean) => {
     sugerencias = state ? 1 : 0;
     console.log(sugerencias)
     if (sugerencias === 1) {
@@ -518,10 +519,10 @@ function terminarJuego() {
     }
   };
 
-  // botón para activar y desactivar diagonal
+// botón para activar y desactivar diagonal
 
   const handleToggleDiagonal = (state: boolean) => {
-    diagonalMovementsEnabled = state;
+    movimientoDiagonal = state;
   };
 
 
