@@ -1,7 +1,6 @@
 import BotonReiniciar from "./BotonRestart";
 import swal from "sweetalert2";
 import { TogglerSwitch } from './Sugerencias';
-import React, { useState, useEffect } from "react";
 import { DiagonalToggle } from "./ToggleDiagonalMovements";
 
 export default function InitialBoard() {
@@ -20,20 +19,23 @@ export default function InitialBoard() {
   let fichasRestantesBlanca = 30; // fichas restantes blancas
   let gameOver = false; // variable para decidir si el juego ha terminado
   let sugerencias = 0; // variable para decidir si se muestran las sugerencias
-  let diagonalMovementsEnabled = false
+  let diagonalMovementsEnabled = false // variable para activar y desactivar el movimiento diagonal
+  const boardSize = 8; // tamaño del tablero
 
-
-  // tablero
-  let fichas = [
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,2,1,0,0,0],
-    [0,0,0,1,2,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0],
-  ]
+  // funcion para crear el tablero
+  let fichas: number[][] = []
+  function initializeBoard(size: number) {
+    fichas = new Array(size);
+    for (let i = 0; i < size; i++) {
+      fichas[i] = new Array(size).fill(0);
+    }
+    const mid = Math.floor(size / 2);
+    fichas[mid - 1][mid - 1] = 2;
+    fichas[mid - 1][mid] = 1;
+    fichas[mid][mid - 1] = 1;
+    fichas[mid][mid] = 2;
+  }
+  
 
 
   //función on load
@@ -45,14 +47,15 @@ window.onload = function() {
     if(sugerencias === 1 && capaDeSugerencias){
       creaCapaDeSugerencias();
     }
+    initializeBoard(boardSize);
 
   // fondo negro
   BBackground = document.getElementById('BBackground');
   if (BBackground) {
     BBackground.style.position = "absolute";
     BBackground.style.background = "black";
-    BBackground.style.width = `${tamañoCeldas * 8 + (gap * 4)}px`;
-    BBackground.style.height = `${tamañoCeldas * 8 + (gap * 4)}px`;
+    BBackground.style.width = `${tamañoCeldas * boardSize + (gap * 4)}px`;
+    BBackground.style.height = `${tamañoCeldas * boardSize + (gap * 4)}px`;
     BBackground.style.borderRadius = "10px";
     BBackground.style.top = "50%";
     BBackground.style.left = "50%";
@@ -84,8 +87,8 @@ window.onload = function() {
 
   // función para crear los cuadros verdes del mapa (se modificará para expandir el tablero)
 function creaCuadrosVerdes() {
-  for (let filas = 0; filas < 8; filas++) {
-    for (let columnas = 0; columnas < 8; columnas++) {
+  for (let filas = 0; filas < boardSize; filas++) {
+    for (let columnas = 0; columnas < boardSize; columnas++) {
         const greenSquare = document.createElement('div');
         greenSquare.className = 'absolute bg-green-600';
         greenSquare.style.width = `${tamañoCeldas+3}px`;
@@ -123,13 +126,13 @@ function clickEnCuadro(filas: number, columnas: number) {
       }
       if(turno === 1) turno = 2;
       else if (turno === 2) turno = 1;
-      if (!puedeMover(1) || !puedeMover(2)) {
+      if (!puedeMover(1) || !puedeMover(2) || fichasRestantesBlanca === 0 || fichasRestantesNegra === 0) {
         gameOver = true;
-        terminarJuego()
-      };
+        terminarJuego();
+      }
       actualizaFichasRestantes();
       creaFichas();
-      if(sugerencias === 1){
+      if (sugerencias === 1) {
         creaCapaDeSugerencias();
       }
       creaPuntuaciones();
@@ -147,8 +150,8 @@ function clickEnCuadro(filas: number, columnas: number) {
   // funcioon para comprobar si se pueden mover
 
   function puedeMover(id: number) {
-  for (let filas = 0; filas < 8; filas++) {
-    for (let columnas = 0; columnas < 8; columnas++) {
+    for (let filas = 0; filas < boardSize; filas++) {
+      for (let columnas = 0; columnas < boardSize; columnas++) {
       if (fichas[filas][columnas] === 0 && puedeDarClick(id, filas, columnas)) {
         return true;
       }
@@ -164,8 +167,8 @@ function clickEnCuadro(filas: number, columnas: number) {
     let puntuacionNegra = 0;
     
 
-    for(let filas = 0; filas < 8; filas ++){
-      for (let columnas = 0; columnas < 8; columnas++) {
+    for (let filas = 0; filas < boardSize; filas++) {
+      for (let columnas = 0; columnas < boardSize; columnas++) {
           let value = fichas[filas][columnas];
           if(value === 2){ 
             puntuacionBlanca++;
@@ -188,8 +191,8 @@ function clickEnCuadro(filas: number, columnas: number) {
   function creaFichas(){
     if(capaDeFichas !== null){
     capaDeFichas.innerHTML = "";}
-    for(let filas = 0; filas < 8; filas ++){
-      for (let columnas = 0; columnas < 8; columnas++) {
+    for (let filas = 0; filas < boardSize; filas++) {
+      for (let columnas = 0; columnas < boardSize; columnas++) {
         let value = fichas[filas][columnas];
         if(value === 0){
 
@@ -224,8 +227,8 @@ function clickEnCuadro(filas: number, columnas: number) {
   if(capaDeSugerencias !== null){
     capaDeSugerencias.remove();
   }
-  for(let filas = 0; filas < 8; filas ++){
-    for (let columnas = 0; columnas < 8; columnas++) {
+  for (let filas = 0; filas < boardSize; filas++) {
+    for (let columnas = 0; columnas < boardSize; columnas++) {
       let value = fichas[filas][columnas];
       if(value === 0 && puedeDarClick(turno, filas, columnas)){
         const fichaSugerencia = document.createElement('div');
@@ -260,7 +263,7 @@ function clickEnCuadro(filas: number, columnas: number) {
     let fichasAfectadasTemp: any = [];
     let iteradorColumnas = columnas;
     let iteradorFilas = filas;
-    while(iteradorColumnas < 7){
+    while(iteradorColumnas < boardSize - 1){
       iteradorColumnas++;
       let value = fichas[filas][iteradorColumnas];
       if(value === 0 || value === id){
@@ -311,7 +314,7 @@ function clickEnCuadro(filas: number, columnas: number) {
     // hacia arriba
     fichasAfectadasTemp = [];
     iteradorFilas = filas;
-    while(iteradorFilas < 7){
+    while(iteradorFilas < boardSize - 1){
       iteradorFilas++;
       let value = fichas[iteradorFilas][columnas];
       if(value === 0 || value === id){
@@ -333,7 +336,7 @@ function clickEnCuadro(filas: number, columnas: number) {
       fichasAfectadasTemp = [];
       iteradorFilas = filas;
       iteradorColumnas = columnas;
-      while(iteradorFilas < 7 && iteradorColumnas < 7){
+      while(iteradorFilas < boardSize - 1 && iteradorColumnas < boardSize - 1){
         iteradorFilas++;
         iteradorColumnas++;
       let value = fichas[iteradorFilas][iteradorColumnas];
@@ -352,7 +355,7 @@ function clickEnCuadro(filas: number, columnas: number) {
       fichasAfectadasTemp = [];
       iteradorFilas = filas;
       iteradorColumnas = columnas;
-      while(iteradorFilas < 7 && iteradorColumnas > 0){
+      while(iteradorFilas < boardSize - 1 && iteradorColumnas > 0){
         iteradorFilas++;
         iteradorColumnas--;
       let value = fichas[iteradorFilas][iteradorColumnas];
@@ -390,7 +393,7 @@ function clickEnCuadro(filas: number, columnas: number) {
       fichasAfectadasTemp = [];
       iteradorFilas = filas;
       iteradorColumnas = columnas;
-      while(iteradorFilas > 0 && iteradorColumnas < 7){
+      while(iteradorFilas > 0 && iteradorColumnas < boardSize - 1){
         iteradorFilas--;
         iteradorColumnas++;
       let value = fichas[iteradorFilas][iteradorColumnas];
@@ -440,8 +443,8 @@ function terminarJuego() {
   let puntuacionNegra = 0;
   let mensaje = "";
 
-  for (let filas = 0; filas < 8; filas++) {
-    for (let columnas = 0; columnas < 8; columnas++) {
+  for (let filas = 0; filas < boardSize; filas++) {
+    for (let columnas = 0; columnas < boardSize; columnas++) {
       let value = fichas[filas][columnas];
       if (value === 2) {
         puntuacionBlanca++;
@@ -489,17 +492,8 @@ function terminarJuego() {
 
   // función para reiniciar el tablero
 
-  function reiniciarTablero(){
-    fichas = [
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,2,1,0,0,0],
-      [0,0,0,1,2,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-    ];
+  function reiniciarTablero() {
+    initializeBoard(boardSize);
     turno = 1;
     fichasRestantesNegra = 30;
     fichasRestantesBlanca = 30;
@@ -507,6 +501,7 @@ function terminarJuego() {
     creaFichas();
     creaPuntuaciones();
     actualizaFichasRestantes();
+    creaCuadrosVerdes();
   }
 
   // botón para activar y desactivar sugerencias
@@ -526,7 +521,10 @@ function terminarJuego() {
   // botón para activar y desactivar diagonal
 
   const handleToggleDiagonal = (state: boolean) => {
+    diagonalMovementsEnabled = state;
   };
+
+
  
 
   return (

@@ -2,11 +2,12 @@ import './App.css'
 import InitialBoard from './components/InitialBoard'
 import { ScoreBlack } from './components/ScoreBlack'
 import { ScoreWhithe } from './components/ScoreWhithe'
+import SquareComponent from './components/SquareComponent'
 
 function App() {
   
    return (
-    <div>
+    <div className="w-full flex justify-center">
         <InitialBoard />
         <ScoreBlack/>
         <ScoreWhithe/>
