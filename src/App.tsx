@@ -2,7 +2,6 @@ import './App.css'
 import InitialBoard from './components/InitialBoard'
 import { ScoreBlack } from './components/ScoreBlack'
 import { ScoreWhithe } from './components/ScoreWhithe'
-import SquareComponent from './components/SquareComponent'
 
 function App() {
   
